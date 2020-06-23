@@ -6,6 +6,10 @@ source:
   git_rev: tags/v1.0
   git_url: git@github.com:mohsu/mylib.git
 
+build:
+  noarch: python
+  number: 0
+
 requirements:
   build:
     - python >=3.6
