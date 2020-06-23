@@ -8,11 +8,11 @@ source:
 
 requirements:
   build:
-    - python 3.7
+    - python >=3.6
     - setuptools
     - numpy >=1.18
   run:
-    - python 3.7
+    - python >=3.6
     - tensorflow >=2.2
     - pynvml
     - requests
