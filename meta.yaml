@@ -3,7 +3,7 @@ package:
   version: "v1.0"
 
 source:
-  git_rev: v1.0 (or latest from https://github.com/mohsu/mylib/releases)
+  git_rev: https://github.com/mohsu/mylib/releases/v1.0
   git_url: https://github.com/mohsu/mylib.git
 
 requirements:
