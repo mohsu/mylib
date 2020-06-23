@@ -10,8 +10,6 @@
 # 3rd-party packages
 from loguru import logger
 import numpy as np
-import tensorflow.keras as keras
-
 
 # self-defined packages
 

@@ -6,13 +6,9 @@
 """
 
 # python packages
-import itertools
-import time
 from enum import EnumMeta, Flag
 
 # 3rd-party
-from pandas.core.common import flatten
-from loguru import logger
 
 
 # self-defined packages
