@@ -1,9 +1,9 @@
 package:
   name: mylib
-  version: 1.0
+  version: "v1.0"
 
 source:
-  git_rev:
+  git_rev: v1.0 (or latest from https://github.com/mohsu/mylib/releases)
   git_url: https://github.com/mohsu/mylib.git
 
 requirements:
@@ -19,4 +19,4 @@ test:
     -
 
 about:
-  home:
+  home: https://github.com/mohsu
