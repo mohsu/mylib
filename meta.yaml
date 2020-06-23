@@ -4,12 +4,23 @@ package:
 
 source:
   git_rev: tags/v1.0
-  git_url: https://github.com/mohsu/mylib.git
+  git_url: git@github.com:mohsu/mylib.git
 
 requirements:
   build:
-    - python
+    - python 3.7
     - setuptools
+    - numpy >=1.18
+  run:
+    - python 3.7
+    - tensorflow >=2.2
+    - pynvml
+    - requests
+    - matplotlib
+    - loguru
+    - imgaug
+    - numpy >=1.18
+    - matplotlib
 
 about:
   home: https://github.com/mohsu
