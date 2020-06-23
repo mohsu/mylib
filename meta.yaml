@@ -11,12 +11,5 @@ requirements:
     - python
     - setuptools
 
-  run:
-    - python
-
-test:
-  imports:
-    -
-
 about:
   home: https://github.com/mohsu
