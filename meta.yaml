@@ -1,9 +1,9 @@
 package:
   name: mylib
-  version: "v1.0"
+  version: "1.0"
 
 source:
-  git_rev: tags/v1.0
+  git_rev: tags/1.0
   git_url: git@github.com:mohsu/mylib.git
 
 build:
