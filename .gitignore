@@ -134,10 +134,4 @@ dmypy.json
 out
 gen
 
-/data/*
-/venv
-!.gitkeep
-
-test*.py
-!/test/*
-!/sample/test
+/mylib/*
