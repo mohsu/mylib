@@ -9,6 +9,22 @@ IMAGE_EXT = [".jpg", ".png"]
 
 
 @logger.catch(reraise=True)
+def copy(path1, path2):
+    shutil.copy2(path1, path2)
+
+
+@logger.catch(reraise=True)
+def rename(path1, path2):
+    tmp_file = f"{path1}.tmp"
+    shutil.copy2(path1, tmp_file)
+    try:
+        os.rename(path1, path2)
+    except Exception as e:
+        pass
+    rm(tmp_file)
+
+
+@logger.catch(reraise=True)
 def chdir(path):
     logger.debug("Current path has changed to {}".format(os.path.abspath(path)))
     os.chdir(path)
@@ -40,8 +56,9 @@ def check_pattern(pattern, filename, check_all=False):
 def check_patterns(patterns, filename, check_all=False):
     for pattern in patterns:
         is_contain = check_pattern(pattern, filename, False)
-        if check_all and not is_contain:
-            return False
+        if check_all:
+            if not is_contain:
+                return False
         elif is_contain:
             return True
 
@@ -77,7 +94,8 @@ def check_extensions(extensions, filename):
 
 @logger.catch(reraise=True)
 def list_dir(_dir, sort=False, recursive=False, pattern=None,
-             extension=None, full_path=True, abs_path=False, exclude_pattern="\x00", check_all_pattern=False):
+             extension=None, full_path=True, abs_path=False, exclude_pattern="\x00", check_all_pattern=False,
+             sort_key=None):
     paths = []
     if not os.path.exists(_dir):
         return paths
@@ -87,8 +105,6 @@ def list_dir(_dir, sort=False, recursive=False, pattern=None,
 
     if not recursive:
         files = os.listdir(_dir)
-        if sort:
-            files = sorted(files)
 
         for i in range(len(files)):
             if check_pattern(pattern, files[i], check_all_pattern) and \
@@ -116,6 +132,12 @@ def list_dir(_dir, sort=False, recursive=False, pattern=None,
                         else:
                             paths.append(filename)
 
+    if sort:
+        if sort_key is not None:
+            paths = sorted(paths, key=sort_key)
+        else:
+            paths = sorted(paths)
+
     return paths
 
 
@@ -135,6 +157,7 @@ def dirname(path, depth=1, full_path=True):
             _dir = os.path.dirname(_dir)
     if not full_path:
         _dir = os.path.basename(_dir)
+
     return _dir
 
 
