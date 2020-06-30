@@ -73,22 +73,25 @@ def save_image(image, image_path, make_dir=True, convert_BGR=False):
 def draw_box(image, bbox, color=(255, 0, 0), label=None, font_size=1):
     image = np.copy(image)
     H, W = image.shape[:2]
-    h_stride, w_stride = H // 100, W // 100
+    h_stride, w_stride = H // 60, W // 200
+    bbox_label = None
     if isinstance(bbox, list) or isinstance(bbox, tuple):
         if len(bbox) == 5:
-            x1, y1, x2, y2, label = bbox
+            x1, y1, x2, y2, bbox_label = bbox
         else:
             x1, y1, x2, y2 = bbox
     elif hasattr(bbox, "name"):  # is object
-        x1, y1, x2, y2, label = int(bbox.x1), int(bbox.y1), int(bbox.x2), int(bbox.y2), bbox.name
+        x1, y1, x2, y2, bbox_label = int(bbox.x1), int(bbox.y1), int(bbox.x2), int(bbox.y2), bbox.name
     else:
         x1, y1, x2, y2 = int(bbox.x1), int(bbox.y1), int(bbox.x2), int(bbox.y2)
 
-    cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), color, 1)
+    cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
     if label:
-        cv2.putText(image, str(label), (x1 + w_stride, y1 + h_stride), cv2.FONT_HERSHEY_COMPLEX_SMALL, font_size, color,
-                    1,
-                    cv2.LINE_AA)
+        cv2.putText(image, str(label), (x1 + w_stride, y1 - h_stride), cv2.FONT_HERSHEY_COMPLEX_SMALL, font_size, color,
+                    1, cv2.LINE_4)
+    elif bbox_label:
+        cv2.putText(image, str(label), (x1 + w_stride, y1 - h_stride), cv2.FONT_HERSHEY_COMPLEX_SMALL, font_size, color,
+                    1, cv2.LINE_4)
     return image
 
 
