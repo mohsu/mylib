@@ -1,7 +1,7 @@
 python:
   - 3.7
 numpy:
-  - 1.14
+  - 1.18.1
 # these are centralized here so that they are shared between the numpy and numpy-metapackage recipes
 numpy_version:
   - 1.18.1

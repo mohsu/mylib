@@ -17,14 +17,15 @@ requirements:
     - numpy >=1.18
   run:
     - python >=3.6
-    - tensorflow >=2.2
+    - tensorflow=2.1.0
     - pynvml
     - requests
     - matplotlib
     - loguru
-    - imgaug
+    - imgaug=0.4.0
     - numpy >=1.18
     - matplotlib
+    - opencv=4.2.0
 
 about:
   home: https://github.com/mohsu
