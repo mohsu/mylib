@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='mylib-maureen.hsu',
-    version='1.1',
+    version='1.1.1',
     packages=setuptools.find_packages(),
     url='https://github.com/mohsu/mylib',
     license='',
@@ -16,6 +16,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=['tensorflow>=2.1.0', 'pynvml', 'requests', 'loguru>=0.4.1', 'imgaug>=0.4.0',
-                      'numpy>=1.18.1', 'matplotlib>=3.2.1', 'python-opencv>=4.2.0'],
+                      'numpy>=1.18.1', 'matplotlib>=3.2.1', 'opencv-python'],
     python_requires='>=3.7',
 )
