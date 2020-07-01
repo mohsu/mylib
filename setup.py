@@ -5,7 +5,7 @@ setup(
     name='mylib-maureen.hsu',
     version='1.0',
     packages=setuptools.find_packages(),
-    url='https://github.com:mohsu/mylib.git',
+    url='https://github.com/mohsu/mylib',
     license='',
     author='Maureen Hsu',
     author_email='',
