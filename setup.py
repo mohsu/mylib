@@ -1,12 +1,19 @@
+import setuptools
 from setuptools import setup
 
 setup(
-    name='mylib',
+    name='mylib-maureen.hsu',
     version='1.0',
-    packages=['utils', 'utils.label', 'utils.label.tool'],
-    url='git@github.com:mohsu/mylib.git',
+    packages=setuptools.find_packages(),
+    url='https://github.com:mohsu/mylib.git',
     license='',
     author='Maureen Hsu',
     author_email='',
-    description=''
+    description='',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.7',
 )
