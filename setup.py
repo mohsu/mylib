@@ -2,7 +2,7 @@ import setuptools
 from setuptools import setup
 
 setup(
-    name='mylib-maureen.hsu',
+    name='mylib',
     version='1.0',
     packages=setuptools.find_packages(),
     url='https://github.com/mohsu/mylib',
