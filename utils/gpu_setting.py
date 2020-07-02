@@ -48,13 +48,18 @@ class GPU:
         logger.debug(f"available gpus: {self.physical_devices}")
 
     def set_visible_device(self, visible_device_indexes):
-        if isinstance(visible_device_indexes, int):
-            visible_device_indexes = [visible_device_indexes]
-        visible_devices = []
-        for i in visible_device_indexes:
-            visible_devices.append(self.physical_devices[i])
-        self.config.experimental.set_visible_devices(devices=visible_devices, device_type='GPU')
-        self.visible_devices = visible_devices
+        if visible_device_indexes is None:
+            visible_devices = []
+            self.config.set_visible_devices(devices=visible_devices, device_type='GPU')
+            self.visible_devices = visible_devices
+        else:
+            if isinstance(visible_device_indexes, int):
+                visible_device_indexes = [visible_device_indexes]
+            visible_devices = []
+            for i in visible_device_indexes:
+                visible_devices.append(self.physical_devices[i])
+            self.config.experimental.set_visible_devices(devices=visible_devices, device_type='GPU')
+            self.visible_devices = visible_devices
         logger.debug(f"Set available gpus: {visible_devices}")
 
     def set_allow_growth(self, allow_growth):
