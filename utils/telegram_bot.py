@@ -30,16 +30,20 @@ class TgBot:
         self.token = token
         self.send_photo_url = "https://api.telegram.org/bot{}/sendPhoto".format(token)
 
-    def send_message(self, telegram_group_chat_id, text):
+    def send_message(self, telegram_group_chat_id, text, parse_mode=None):
         """
         Send message from telegram bot in group
         :param telegram_group_chat_id:
         :param text:
         :return:
         """
-        r = requests.get("https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}".format(self.token,
-                                                                                                telegram_group_chat_id,
-                                                                                                text))
+        request = "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}".format(self.token,
+                                                                                         telegram_group_chat_id,
+                                                                                         text)
+        if parse_mode is not None:
+            request += "&parse_mode={}".format(parse_mode)
+        r = requests.get(request)
+
         return r
 
     def send_photo(self, image_io, telegram_group_chat_id, caption=None):
