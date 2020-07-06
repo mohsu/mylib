@@ -10,12 +10,15 @@
 # 3rd-party packages
 from loguru import logger
 import numpy as np
+import tensorflow as tf
+import tensorflow.keras as keras
+
 
 # self-defined packages
 
 
 @logger.catch(reraise=True)
-class VOCDataGenerator:
+class VOCDataGenerator(keras.utils.Sequence):
     """Generates data for Keras"""
 
     def __init__(self, dataset, batch_size,
@@ -36,14 +39,12 @@ class VOCDataGenerator:
         """Denotes the number of batches per epoch"""
         return int(np.floor(len(self.dataset) / self.batch_size))
 
-    def flow(self):
+    def __getitem__(self, index):
         """Generate one batch of data"""
         # Generate data
-        index = 0
-        while True:
-            X, y = self.__data_generation(index)
-            index += 1
-            yield X, y
+        X, y = self.__data_generation(index)
+
+        return X, y
 
     def on_epoch_end(self):
         self.indexes = np.arange(len(self.dataset))
@@ -54,12 +55,8 @@ class VOCDataGenerator:
     def __data_generation(self, index):
         """Generates data containing batch_size samples"""  # X : (n_samples, *dim, n_channels)
         i = self.batch_size * index
-
         batch_images, batch_labels = [], []
         while len(batch_images) < self.batch_size:
-            if i == 0 and self.is_shuffle:
-                np.random.shuffle(self.indexes)
-
             batch_indexes = []
             for b in range(self.batch_size):
                 batch_indexes.append(self.indexes[i])
@@ -86,5 +83,3 @@ class VOCDataGenerator:
     def get_all(self):
         images, labels = self.read_data_method(self.dataset.annotations, self.indexes)
         return images, labels
-
-
