@@ -610,11 +610,17 @@ class VOCAnnotationSet(VOCLabel):
 
         # load from dir or jsons or json
         if dir_or_file:
-            if isinstance(dir_or_file, list):
+            if isinstance(dir_or_file, list) and all(os_path.isfile(x) for x in dir_or_file):
                 self.load_from_jsons(dir_or_file, debug=debug,
                                      for_classification=for_classification, image_dir=image_dir)
-            elif os_path.isdir(dir_or_file):
-                label_files = os_path.list_dir(dir_or_file, extension=".json")
+            elif os_path.isdir(dir_or_file) or \
+                    (isinstance(dir_or_file, list) and all(os_path.isdir(x) for x in dir_or_file)):
+                if os_path.isdir(dir_or_file):
+                    label_files = os_path.list_dir(dir_or_file, extension=".json")
+                else:
+                    label_files = []
+                    for lf in dir_or_file:
+                        label_files += os_path.list_dir(lf, extension=".json")
                 if not label_files:
                     label_files = os_path.list_dir(os_path.join(dir_or_file, ANNOTATION_FOLDER_DEFAULT_NAME),
                                                    extension=".json")
