@@ -45,6 +45,19 @@ def get_indexes(nb_samples, test_split, val_split, is_shuffle):
     return train_indexes, val_indexes, test_indexes
 
 
+def VOCAnnotationSets(datasets, voc_dataset_class, image_dirs):
+    voc_set = None
+    for dir_, image_dir in zip(datasets, image_dirs):
+        _set = VOCAnnotationSet(dir_,
+                                defined_classes=voc_dataset_class,
+                                image_dir=image_dir)
+        if voc_set is None:
+            voc_set = _set
+        else:
+            voc_set.add_annotation(_set.annotations)
+    return voc_set
+
+
 class VOCDataSubset(VOCAnnotationSet):
     @property
     def training(self):
