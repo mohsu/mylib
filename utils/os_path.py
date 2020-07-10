@@ -14,6 +14,17 @@ def copy(path1, path2):
 
 
 @logger.catch(reraise=True)
+def copytree(src, dst, symlinks=False, ignore=None):
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
+
+
+@logger.catch(reraise=True)
 def rename(path1, path2):
     tmp_file = f"{path1}.tmp"
     shutil.copy2(path1, tmp_file)
