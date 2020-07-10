@@ -14,10 +14,13 @@ def copy(path1, path2):
 
 
 @logger.catch(reraise=True)
-def copytree(src, dst, symlinks=False, ignore=None):
+def copytree(src, dst, symlinks=False, ignore=None, overwrite=True):
     for item in os.listdir(src):
         s = os.path.join(src, item)
         d = os.path.join(dst, item)
+        if overwrite and os.path.exists(d):
+            rm(d)
+
         if os.path.isdir(s):
             shutil.copytree(s, d, symlinks, ignore)
         else:
