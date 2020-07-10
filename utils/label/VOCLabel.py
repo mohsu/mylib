@@ -57,11 +57,11 @@ class VOCBbox(VOCLabel):
     @xmin.setter
     def xmin(self, value):
         if hasattr(self, "xmax"):
-            assert value < self.xmax
+            assert value < self.xmax, f"Cannot set property xmax, {value} > {self.xmax}"
         self._xmin = value
         if hasattr(self, "xmax"):
             self._width = self.xmax - self.xmin
-            assert self.width > 0
+            assert self.width > 0, f"width: {self._width} < 0"
 
     @property
     def x1(self):
@@ -86,11 +86,11 @@ class VOCBbox(VOCLabel):
     @xmax.setter
     def xmax(self, value):
         if hasattr(self, "xmin"):
-            assert value > self.xmin
+            assert value > self.xmin, f"Cannot set property xmin, {value} < {self.xmin}"
         self._xmax = value
         if hasattr(self, "xmin"):
             self._width = self.xmax - self.xmin
-            assert self.width > 0
+            assert self.width > 0 ,f"width: {self._width} < 0"
 
     @property
     def ymin(self):
@@ -99,7 +99,7 @@ class VOCBbox(VOCLabel):
     @ymin.setter
     def ymin(self, value):
         if hasattr(self, "ymax"):
-            assert value < self.ymax
+            assert value < self.ymax, f"Cannot set property ymin, {value} > {self.ymax}"
         self._ymin = value
         if hasattr(self, "ymax"):
             self._height = self.ymax - self.ymin
@@ -112,7 +112,7 @@ class VOCBbox(VOCLabel):
     def ymax(self, value):
         self._ymax = value
         if hasattr(self, "ymin"):
-            assert value > self.ymin
+            assert value > self.ymin, f"Cannot set property ymax, {value} < {self.ymin}"
             self._height = self.ymax - self.ymin
 
     def get_coords(self, format=None):
