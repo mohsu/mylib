@@ -65,11 +65,11 @@ class VOCDataSubset(VOCAnnotationSet):
 
     @property
     def testing(self):
-        return self._get_subset(Dataset.VALIDATION)
+        return self._get_subset(Dataset.TEST)
 
     @property
     def validation(self):
-        return self._get_subset(Dataset.TEST)
+        return self._get_subset(Dataset.VALIDATION)
 
     @property
     def nb_samples(self):
