@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mylib_maureen',
-    version='1.2.6',
+    version='1.2.7',
     packages=find_packages(),
     url='https://github.com/mohsu/mylib',
     author='Maureen Hsu',
