@@ -461,7 +461,7 @@ class VOCAnnotation(VOCLabel):
 
         os_path.make_dir(os_path.dirname(filepath))
 
-        with open(filepath + ".json", "w+") as f:
+        with open(filepath, "w+") as f:
             f.write(json.dumps(self.to_dic(recursively=True), cls=VOCJSONEncoder))
         logger.debug(f"Json {filepath} exported.")
 
