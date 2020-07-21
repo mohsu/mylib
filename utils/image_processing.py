@@ -75,7 +75,7 @@ def draw_box(image, bbox, color=(255, 0, 0), label=None, font_size=1):
     H, W = image.shape[:2]
     h_stride, w_stride = H // 60, W // 200
     bbox_label = None
-    if isinstance(bbox, list) or isinstance(bbox, tuple):
+    if isinstance(bbox, list) or isinstance(bbox, tuple) or isinstance(bbox, np.ndarray):
         if len(bbox) == 5:
             x1, y1, x2, y2, bbox_label = bbox
         else:
