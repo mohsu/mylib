@@ -25,7 +25,7 @@ class LogHistory(keras.callbacks.Callback):
         logger.debug(s)
 
 
-def plot_history(history):
+def plot_history(history, save_path=None):
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
     plt.title('model loss')
@@ -33,6 +33,9 @@ def plot_history(history):
     plt.xlabel('epoch')
     plt.legend(['train', 'val'], loc='upper left')
     plt.show()
+
+    if save_path:
+        plt.savefig(save_path)
 
 
 def get_balanced_weight(dic_class):
