@@ -32,10 +32,12 @@ def plot_history(history, save_path=None):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'val'], loc='upper left')
-    plt.show()
-
     if save_path:
         plt.savefig(save_path)
+
+    plt.show()
+
+
 
 
 def get_balanced_weight(dic_class):
