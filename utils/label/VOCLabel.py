@@ -320,7 +320,7 @@ class VOCAnnotation(VOCLabel):
         if self._annotation_path:
             return self._annotation_path
         elif self.filename:  # default value
-            return os_path.join(os_path.dirname(self.folder, full_path=False), ANNOTATION_FOLDER_DEFAULT_NAME,
+            return os_path.join(os_path.dirname(self.folder, full_path=True), ANNOTATION_FOLDER_DEFAULT_NAME,
                                 self.filename + ".json")
         return None
 
@@ -331,8 +331,8 @@ class VOCAnnotation(VOCLabel):
 
     @property
     def filename(self):
-        if self.annotation_path:
-            return os_path.get_filename(self.annotation_path)
+        if self._annotation_path:
+            return os_path.get_filename(self._annotation_path)
         if self.image_path:
             return os_path.get_filename(self.image_path)
         return None
