@@ -8,6 +8,7 @@
 # python packages
 from enum import EnumMeta, Flag
 
+
 # 3rd-party
 
 
@@ -107,14 +108,14 @@ class BoolFlag(Flag, metaclass=ReversibleEnumMeta):
     def __hash__(self):
         return id(self)
 
+    @classmethod
+    def get_pair(cls, item):
+        return ReversibleEnumMeta.get_pair(cls, bool(item))
+
 
 class CombinedEnumElement(list):
     def __str__(self):
         return "".join([str(x) for x in self])
-
-
-
-
 
 # class CombinedReversibleEnum:
 #     def __init__(self, *enums, list_overlap=None):
