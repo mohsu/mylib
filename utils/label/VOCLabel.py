@@ -723,3 +723,5 @@ class VOCAnnotationSet(VOCLabel):
         for ann in self.annotations:
             ann.unpack()
         self._unpacked = True
+
+
