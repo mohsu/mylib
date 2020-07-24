@@ -208,7 +208,7 @@ class YoloModel(CNNModel):
 
         # rescale bounding boxes
         def rescale_bbox(pred_box):
-            bbox = ia.BoundingBoxesOnImage.from_xyxy_array(pred_box, shape=images[0].shape)
+            bbox = ia.BoundingBoxesOnImage.from_xyxy_array(pred_box, shape=self.input_size + (self.channels,))
             reversed_bbox = reverse_seq(bounding_boxes=bbox).to_xyxy_array().astype('int32')
             return reversed_bbox
 
