@@ -178,15 +178,20 @@ class YoloModel(CNNModel):
 
         self.__dict__.update(yolo_model.__dict__)
 
-    def process_test_data(self, images):
+    def process_test_data(self, images, convert_BGR=False):
         if not isinstance(images, list) and (isinstance(images, np.ndarray) and images.ndim == 3):
             images = [images]
 
         images = self.img_aug.aug(images)[0]
+        images = np.array(images)
+        if convert_BGR:
+            red = images[..., 0]
+            images[..., 0], images[..., 2] = images[..., 2], red
+
         return np.array(images)
 
-    def detect(self, images, to_annotation=False):
-        images = self.process_test_data(images)
+    def detect(self, images, convert_BGR=False, to_annotation=False):
+        images = self.process_test_data(images, convert_BGR)
         preds = self.predict_on_batch(images)
         pred_boxes, scores = decode_nms(preds, self.input_size + (self.channels,))
         pred_labels = convert2_class(scores, self.num_classes)
