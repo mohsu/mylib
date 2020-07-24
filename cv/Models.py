@@ -203,7 +203,7 @@ class YoloModel(CNNModel):
                 pred_score_obj = pred_score[n_obj]
                 if len(pred_score_obj) == 1:
                     pred_score_obj = pred_score_obj[0]
-                objs.append(VOCObject(name=named_classes, bbox=list(pred_boxes[n_image][n_obj]), score=pred_score))
+                objs.append(VOCObject(name=named_classes, bbox=list(pred_boxes[n_image][n_obj]), score=pred_score_obj))
             annotations.append(VOCAnnotation(size=images[n_image].shape[:2], objects=objs))
         return annotations
 
