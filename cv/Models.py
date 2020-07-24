@@ -8,6 +8,7 @@
 # python packages
 
 # 3rd-party packages
+import imgaug as ia
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model, Model
@@ -179,9 +180,6 @@ class YoloModel(CNNModel):
         self.__dict__.update(yolo_model.__dict__)
 
     def process_test_data(self, images, convert_BGR=False):
-        if not isinstance(images, list) and (isinstance(images, np.ndarray) and images.ndim == 3):
-            images = [images]
-
         images = self.img_aug.aug(images)[0]
         images = np.array(images)
         if convert_BGR:
@@ -191,8 +189,20 @@ class YoloModel(CNNModel):
         return np.array(images)
 
     def detect(self, images, convert_BGR=False, to_annotation=False):
-        images = self.process_test_data(images, convert_BGR)
-        preds = self.predict_on_batch(images)
+        """
+
+        :param images: list of images that has same shape
+        :param convert_BGR:
+        :param to_annotation:
+        :return:
+        """
+        if not isinstance(images, list) and (isinstance(images, np.ndarray) and images.ndim == 3):
+            images = [images]
+
+        reverse_seq = self.get_reverse_seq(images[0].shape[:2])
+
+        processed_images = self.process_test_data(images, convert_BGR)
+        preds = self.predict_on_batch(processed_images)
         pred_boxes, scores = decode_nms(preds, self.input_size + (self.channels,))
         pred_labels = convert2_class(scores, self.num_classes)
 
@@ -203,12 +213,21 @@ class YoloModel(CNNModel):
         for n_image in range(len(images)):
             pred_klass, pred_score = pred_labels[n_image]
             objs = []
+
+            # rescale bounding boxes
+            bboxes_image = ia.BoundingBoxesOnImage.from_xyxy_array(pred_boxes[n_image], shape=images[n_image].shape)
+            reversed_bbox = reverse_seq(bounding_boxes=bboxes_image).to_xyxy_array().astype('int32')
             for n_obj in range(len(pred_klass)):
+                # process labels
                 named_classes = self.to_named_classes(pred_klass[n_obj])
+
+                # process score
                 pred_score_obj = pred_score[n_obj]
                 if len(pred_score_obj) == 1:
                     pred_score_obj = pred_score_obj[0]
-                objs.append(VOCObject(name=named_classes, bbox=list(pred_boxes[n_image][n_obj]), score=pred_score_obj))
+
+                # create VOCObject
+                objs.append(VOCObject(name=named_classes, bbox=list(reversed_bbox[n_obj]), score=pred_score_obj))
+
             annotations.append(VOCAnnotation(size=images[n_image].shape[:2], objects=objs))
         return annotations
-
