@@ -67,6 +67,8 @@ class GPU:
         for gpu in self.visible_devices:
             try:
                 self.config.experimental.set_memory_growth(gpu, allow_growth)
+            except RuntimeError as e:
+                logger.error(e)
             except:
                 # Invalid device or cannot modify virtual devices once initialized.
                 pass
