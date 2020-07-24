@@ -206,6 +206,13 @@ class YoloModel(CNNModel):
         pred_boxes, scores = decode_nms(preds, self.input_size + (self.channels,))
         pred_labels = convert2_class(scores, self.num_classes)
 
+        # rescale bounding boxes
+        def rescale_bbox(pred_box):
+            bbox = ia.BoundingBoxesOnImage.from_xyxy_array(pred_box, shape=images[0].shape)
+            reversed_bbox = reverse_seq(bounding_boxes=bbox).to_xyxy_array().astype('int32')
+            return reversed_bbox
+
+        pred_boxes = [rescale_bbox(pred_box) for pred_box in pred_boxes]
         if not to_annotation:
             return pred_boxes, pred_labels
 
@@ -214,9 +221,6 @@ class YoloModel(CNNModel):
             pred_klass, pred_score = pred_labels[n_image]
             objs = []
 
-            # rescale bounding boxes
-            bboxes_image = ia.BoundingBoxesOnImage.from_xyxy_array(pred_boxes[n_image], shape=images[n_image].shape)
-            reversed_bbox = reverse_seq(bounding_boxes=bboxes_image).to_xyxy_array().astype('int32')
             for n_obj in range(len(pred_klass)):
                 # process labels
                 named_classes = self.to_named_classes(pred_klass[n_obj])
@@ -227,7 +231,7 @@ class YoloModel(CNNModel):
                     pred_score_obj = pred_score_obj[0]
 
                 # create VOCObject
-                objs.append(VOCObject(name=named_classes, bbox=list(reversed_bbox[n_obj]), score=pred_score_obj))
+                objs.append(VOCObject(name=named_classes, bbox=list(pred_boxes[n_image][n_obj]), score=pred_score_obj))
 
             annotations.append(VOCAnnotation(size=images[n_image].shape[:2], objects=objs))
         return annotations
