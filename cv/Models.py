@@ -151,7 +151,10 @@ class YoloModel(CNNModel):
         return [len(klass) for klass in self.class_names]
 
     def to_named_classes(self, indexes):
-        return [self.class_names[i].get_pair(indexes[i]) for i in range(len(indexes))]
+        named_classes = [self.class_names[i].get_pair(indexes[i]) for i in range(len(indexes))]
+        if len(named_classes) == 1:
+            return named_classes[0]
+        return named_classes
 
     def __init__(self, name, input_size, class_names,
                  training, base_model, anchors, channels=3, grid_factor=32, normalize_input=True, expand_pixel=0):
@@ -197,7 +200,10 @@ class YoloModel(CNNModel):
             objs = []
             for n_obj in range(len(pred_klass)):
                 named_classes = self.to_named_classes(pred_klass[n_obj])
-                objs.append(VOCObject(name=named_classes, bbox=list(pred_boxes[n_image][n_obj]), score=pred_score[n_obj]))
+                pred_score_obj = pred_score[n_obj]
+                if len(pred_score_obj) == 1:
+                    pred_score_obj = pred_score_obj[0]
+                objs.append(VOCObject(name=named_classes, bbox=list(pred_boxes[n_image][n_obj]), score=pred_score))
             annotations.append(VOCAnnotation(size=images[n_image].shape[:2], objects=objs))
         return annotations
 
