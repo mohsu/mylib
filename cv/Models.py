@@ -185,8 +185,8 @@ class YoloModel(CNNModel):
         images = self.img_aug.aug(images)[0]
         images = np.array(images)
         if convert_BGR:
-            red = images[..., 0]
-            images[..., 0], images[..., 2] = images[..., 2], red
+            blue = images[..., 0].copy()
+            images[..., 0], images[..., 2] = images[..., 2], blue
 
         return np.array(images)
 
