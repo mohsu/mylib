@@ -163,14 +163,17 @@ def train(model, train_dataset, val_dataset, model_pretrained=None):
             # TensorBoard(log_dir='../logs'),
             LogHistory()
         ]
+        try:
+            history = model.fit(train_dataset,
+                                epochs=FLAGS.epochs,
+                                callbacks=callbacks,
+                                validation_data=val_dataset)
+        except KeyboardInterrupt:
+            plot_history(history, save_path=os_path.join(os_path.dirname(FLAGS.weights),
+                                                         f"{datetime.datetime.now().strftime('%Y%m%d-%H%M')}.png"))
+        except Exception as e:
+            raise e
 
-        history = model.fit(train_dataset,
-                            epochs=FLAGS.epochs,
-                            callbacks=callbacks,
-                            validation_data=val_dataset)
-
-        plot_history(history, save_path=os_path.join(os_path.dirname(FLAGS.weights),
-                                                     f"{datetime.datetime.now().strftime('%Y%m%d-%H%M')}.png"))
 
 
 @logger.catch(reraise=True)
