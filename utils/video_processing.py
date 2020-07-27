@@ -1,6 +1,7 @@
 import datetime
 import multiprocessing as mp
 import threading
+import queue
 import time
 
 import cv2
@@ -14,15 +15,36 @@ class VideoYielderError(Exception):
         self.msg = msg
 
 
+class VideoCaptureDaemon(threading.Thread):
+    def __init__(self, URL, result_queue):
+        super().__init__()
+        self.daemon = True
+        self.URL = URL
+        self.result_queue = result_queue
+
+    def run(self):
+        self.result_queue.put(cv2.VideoCapture(self.URL))
+
+
+def get_video_capture(URL, timeout=3):
+    res_queue = queue.Queue()
+    VideoCaptureDaemon(URL, res_queue).start()
+    try:
+        return res_queue.get(block=True, timeout=timeout)
+    except queue.Empty:
+        logger.error(
+            'cv2.VideoCapture: could not grab input ({}). Timeout occurred after {:.2f}s'.format(video, timeout))
+
+
 class VideoCaptureNoQueue:
-    def __init__(self, URL):
+    def __init__(self, URL, timeout=3):
         self.frame = []
         self.status = False
         self.is_stop = False
         self.count = 0
 
         # 攝影機連接。
-        self.capture = cv2.VideoCapture(URL)
+        self.capture = get_video_capture(URL, timeout=timeout)
 
         self.start()
 
@@ -46,6 +68,7 @@ class VideoCaptureNoQueue:
             self.status, self.frame = self.capture.read()
             self.count += 1
 
+        self.frame = None  # if capture is stopped, put empty frame to send signal to mother process
         self.capture.release()
 
 
@@ -64,7 +87,7 @@ class VideoYielder:
         self.auto_restart = auto_restart
 
     def start(self):
-        self.cap = VideoCaptureNoQueue(self.path)
+        self.cap = VideoCaptureNoQueue(self.path, timeout=self.timeout)
         self.fps = int(self.cap.get(cv2.CAP_PROP_FPS))  # sudo apt-get install libv4l-dev
         # self.interval = int(self.fps / self.n_frame_per_sec)
         self.interval = 1. / self.n_frame_per_sec
@@ -92,7 +115,7 @@ class VideoYielder:
             self.video_retry += 1
 
             if self.video_retry > 3:
-                logger.error("max_try has reached. Restarting")
+                logger.error(f"max_try {self.video_retry} has reached. Restarting")
 
                 # restart stream
                 self.close()
@@ -223,4 +246,3 @@ if __name__ == '__main__':
             count += 1
             if count % 30 == 1:
                 print("get image {}".format(count))
-
