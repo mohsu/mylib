@@ -198,24 +198,26 @@ def rm(full_path):
 
 
 @logger.catch(reraise=True)
-def cleanup_folder_by_time(folder_s, num_keep):
+def cleanup_folder_by_time(folder_s, num_keep, logging=True):
     contents = list_dir(folder_s, exclude_pattern=".gitkeep", full_path=True)
     files = []
     for content in contents:
         if os.path.isfile(content):
             files.append(content)
         else:
-            cleanup_folder_by_time(content, num_keep)
+            cleanup_folder_by_time(content, num_keep, logging)
 
     files = sorted(files, key=os.path.getctime, reverse=True)  # newest at front (0)
     for i in range(num_keep, len(files)):
         rm(files[i])
-        logger.debug(f"Removing {files[i]}")
+        if logging:
+            logger.debug(f"Removing {files[i]}")
 
     # if directory is empty, then delete
     if not list_dir(folder_s, recursive=True):
         rm(folder_s)
-        logger.debug(f"Removing {folder_s}")
+        if logging:
+            logger.debug(f"Removing {folder_s}")
 
 
 @logger.catch(reraise=True)
