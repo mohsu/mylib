@@ -175,12 +175,11 @@ def train(model, train_dataset, val_dataset, model_pretrained=None):
             raise e
 
 
-
 @logger.catch(reraise=True)
-def test(model, test_dataset, voc_set):
+def test(model, test_dataset, voc_set, box_thres=15):
     model.load_weights(weight_path=FLAGS.weights)
 
-    thres = 15
+    thres = box_thres
     box_col = ["x1", "y1", "x2", "y2"]
     class_names = [x.__name__ for x in model.class_names]
     true_class_names = [f"{x}_true" for x in class_names]
