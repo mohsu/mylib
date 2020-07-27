@@ -193,6 +193,8 @@ class TfDataset:
         size = get_flag("size", self.size)
 
         for i, bbox in enumerate(bbs.bounding_boxes):
+            if (bbox.coords < 0).sum() > 0:  # skip any coord < 0 bbox after augmentation
+                continue
             y_train[i][0:4] = bbox.x1 / size, bbox.y1 / size, bbox.x2 / size, bbox.y2 / size
             # convert label to one hot
             y_idx_start = 4
