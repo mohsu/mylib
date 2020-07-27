@@ -33,7 +33,8 @@ def get_video_capture(URL, timeout=3):
         return res_queue.get(block=True, timeout=timeout)
     except queue.Empty:
         logger.error(
-            'cv2.VideoCapture: could not grab input ({}). Timeout occurred after {:.2f}s'.format(video, timeout))
+            'cv2.VideoCapture: could not grab input ({}). Timeout occurred after {:.2f}s'.format(URL, timeout))
+        return None
 
 
 class VideoCaptureNoQueue:
@@ -44,7 +45,10 @@ class VideoCaptureNoQueue:
         self.count = 0
 
         # 攝影機連接。
-        self.capture = get_video_capture(URL, timeout=timeout)
+        cap = None
+        while cap is None:
+            cap = get_video_capture(URL, timeout=timeout)
+        self.capture = cap
 
         self.start()
 
