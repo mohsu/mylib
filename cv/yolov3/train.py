@@ -30,6 +30,9 @@ from utils import os_path, image_processing
 from cv.yolov3.core.layers import (
     YoloLoss
 )
+from cv.yolov3.core.models import (
+    YoloV3, YoloV3Tiny
+)
 from cv.yolov3.core import utils as yolo_utils
 from utils.keras_utils import LogHistory, plot_history
 
@@ -38,6 +41,7 @@ flags.DEFINE_integer('epochs', default=2, help='number of epochs')
 flags.DEFINE_integer('batch_size', default=24, help='batch size')
 flags.DEFINE_integer('early_stop', default=5, help='early stopping')
 flags.DEFINE_float('learning_rate', default=1e-3, help='learning rate')
+flags.DEFINE_integer('freeze', default=-1, help='freeze layers before xth layer')
 
 flags.DEFINE_boolean('tiny', False, 'yolov3 or yolov3-tiny')
 flags.DEFINE_string('weights', None, 'path to weights file')
@@ -106,38 +110,37 @@ def run_eager_fit(model, train_dataset, val_dataset, optimizer, loss):
 
 
 @logger.catch(reraise=True)
-def train(model, train_dataset, val_dataset, model_pretrained=None):
+def train(model, train_dataset, val_dataset):
     """Configure the model for transfer learning"""
     if FLAGS.transfer == 'none':
         pass  # Nothing to do
     elif FLAGS.transfer in ['darknet', 'no_output']:
-        if model_pretrained is None:
-            raise Exception("Pretrained model is not defined, "
-                            "but transfer has been set as darknet/no_output which requires pretrained model.")
-        # Darknet transfer is a special case that works with incompatible number of classes
-        # reset top layers
-        # model_pretrained = Model(FLAGS.weights_num_classes)
-        model_pretrained.load_weights(weight_path=FLAGS.weights, force=True)
+        if FLAGS.tiny:
+            model_pretrained = YoloV3Tiny()
+        else:
+            model_pretrained = YoloV3()
+        model_pretrained.load_weights(FLAGS.weights, by_name=True)
 
         if FLAGS.transfer == 'darknet':
             model.get_layer('yolo_darknet').set_weights(
                 model_pretrained.get_layer('yolo_darknet').get_weights())
-            yolo_utils.freeze_all(model.get_layer('yolo_darknet'))
+            yolo_utils.freeze_all(model.get_layer('yolo_darknet'), until_layer=FLAGS.freeze)
 
         elif FLAGS.transfer == 'no_output':
             for l in model.layers:
                 if not l.name.startswith('yolo_output'):
                     l.set_weights(model_pretrained.get_layer(l.name).get_weights())
-                    yolo_utils.freeze_all(l)
+                    yolo_utils.freeze_all(l, until_layer=FLAGS.freeze)
 
     else:
         # All other transfer require matching classes
         model.load_weights(weight_path=FLAGS.weights)
+        yolo_utils.freeze_all(model, until_layer=FLAGS.freeze)
 
         if FLAGS.transfer == 'fine_tune':
             # freeze darknet and fine tune other layers
             darknet = model.get_layer('yolo_darknet')
-            yolo_utils.freeze_all(darknet)
+            yolo_utils.freeze_all(darknet, until_layer=FLAGS.freeze)
         elif FLAGS.transfer == 'frozen':
             # freeze everything
             yolo_utils.freeze_all(model)
