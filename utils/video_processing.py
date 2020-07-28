@@ -26,7 +26,7 @@ class VideoCaptureDaemon(threading.Thread):
         self.result_queue.put(cv2.VideoCapture(self.URL))
 
 
-def get_video_capture(URL, timeout=3):
+def get_video_capture(URL, timeout=5):
     res_queue = queue.Queue()
     VideoCaptureDaemon(URL, res_queue).start()
     try:
@@ -38,7 +38,7 @@ def get_video_capture(URL, timeout=3):
 
 
 class VideoCaptureNoQueue:
-    def __init__(self, URL, timeout=3):
+    def __init__(self, URL, timeout=5):
         self.frame = []
         self.status = False
         self.is_stop = False
@@ -48,6 +48,7 @@ class VideoCaptureNoQueue:
         cap = None
         while cap is None:
             cap = get_video_capture(URL, timeout=timeout)
+            timeout += 1
         self.capture = cap
 
         self.start()
