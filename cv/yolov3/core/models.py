@@ -66,7 +66,7 @@ def Darknet(name=None):
     return Model(inputs, (x_36, x_61, x), name=name)
 
 
-def YoloV3(size=None, channels=3, anchors=yolo_anchors, masks=yolo_anchor_masks, classes=80, training=False):
+def YoloV3(size=None, channels=3, anchors=yolo_anchors, masks=yolo_anchor_masks, classes=[80], training=False):
     if isinstance(size, tuple):
         input_shape = size + (channels,)
     else:
@@ -118,7 +118,7 @@ def DarknetTiny(name=None):
 
 
 def YoloV3Tiny(size=None, channels=3, anchors=yolo_tiny_anchors,
-               masks=yolo_tiny_anchor_masks, classes=80, training=False):
+               masks=yolo_tiny_anchor_masks, classes=[80], training=False):
     if isinstance(size, tuple):
         input_shape = size + (channels,)
     else:
