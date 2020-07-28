@@ -241,9 +241,9 @@ def test(model, test_dataset, voc_set, box_thres=15):
     #                                                         axis=1)).reset_index(drop=True)
 
     # expand to size of each other
-    df_preds_repeat = pd.concat([x * len(df_trues[df_trues["index"] == x["index"].iloc[0]]) for _, x in
+    df_preds_repeat = pd.concat([pd.concat([x] * len(df_trues[df_trues["index"] == x["index"].iloc[0]]))  for _, x in
                                  df_preds.groupby(by="index")]).reset_index(drop=True)
-    df_trues_repeat = pd.concat([x * len(df_preds[df_preds["index"] == x["index"].iloc[0]]) for _, x in
+    df_trues_repeat = pd.concat([pd.concat([x] * len(df_preds[df_preds["index"] == x["index"].iloc[0]])) for _, x in
                                  df_trues.groupby(by="index")]).reset_index(drop=True)
 
     # reset indexes
