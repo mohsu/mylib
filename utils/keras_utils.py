@@ -18,11 +18,42 @@ class LogHistory(keras.callbacks.Callback):
         pass
 
     def on_epoch_end(self, epoch, logs=None):
-        s = f"[Epoch {epoch+1}/{self.params['epochs']}]"
+        s = f"[Epoch {epoch + 1}/{self.params['epochs']}]"
         for key, value in logs.items():
             s += f" {key}:{value:.4f}"
 
         logger.debug(s)
+
+
+class PlotHistory(keras.callbacks.Callback):
+    def __init__(self, loss=None, val_loss=None):
+        super().__init__()
+        if not loss:
+            loss = []
+        if not val_loss:
+            val_loss = []
+
+        self.loss = loss
+        self.val_loss = val_loss
+
+    def on_batch_begin(self, batch, logs=None):
+        pass
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.loss.append(logs.get("loss", 0))
+        self.val_loss.append(logs.get("val_loss", 0))
+
+    def plot(self, save_path=None):
+        plt.plot(self.loss)
+        plt.plot(self.val_loss)
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'val'], loc='upper left')
+        if save_path:
+            plt.savefig(save_path)
+
+        plt.show()
 
 
 def plot_history(history, save_path=None):
@@ -36,8 +67,6 @@ def plot_history(history, save_path=None):
         plt.savefig(save_path)
 
     plt.show()
-
-
 
 
 def get_balanced_weight(dic_class):
