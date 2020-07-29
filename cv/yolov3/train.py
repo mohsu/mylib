@@ -41,7 +41,7 @@ flags.DEFINE_integer('epochs', default=2, help='number of epochs')
 flags.DEFINE_integer('batch_size', default=24, help='batch size')
 flags.DEFINE_integer('early_stop', default=5, help='early stopping')
 flags.DEFINE_float('learning_rate', default=1e-3, help='learning rate')
-flags.DEFINE_integer('freeze', default=-1, help='freeze layers before xth layer')
+flags.DEFINE_integer('freeze', default=0, help='freeze layers before xth layer')
 
 flags.DEFINE_boolean('tiny', False, 'yolov3 or yolov3-tiny')
 flags.DEFINE_string('weights', None, 'path to weights file')
@@ -135,15 +135,13 @@ def train(model, train_dataset, val_dataset):
     else:
         # All other transfer require matching classes
         model.load_weights(weight_path=FLAGS.weights)
-        yolo_utils.freeze_all(model, until_layer=FLAGS.freeze)
-
         if FLAGS.transfer == 'fine_tune':
             # freeze darknet and fine tune other layers
             darknet = model.get_layer('yolo_darknet')
             yolo_utils.freeze_all(darknet, until_layer=FLAGS.freeze)
         elif FLAGS.transfer == 'frozen':
             # freeze everything
-            yolo_utils.freeze_all(model)
+            yolo_utils.freeze_all(model, until_layer=FLAGS.freeze)
 
     optimizer = tf.keras.optimizers.Adam(lr=FLAGS.learning_rate)
     loss = [YoloLoss(model.anchors[mask], classes=model.num_classes) for mask in model.anchor_masks]
@@ -162,7 +160,7 @@ def train(model, train_dataset, val_dataset):
             EarlyStopping(patience=FLAGS.early_stop, verbose=1),
             ModelCheckpoint(checkpoint_path,
                             monitor='val_loss', verbose=0, save_best_only=False,
-                            save_weights_only=False, mode='auto', save_freq='epoch'),
+                            save_weights_only=True, mode='auto', save_freq='epoch'),
             # TensorBoard(log_dir='../logs'),
             LogHistory()
         ]

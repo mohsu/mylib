@@ -40,15 +40,17 @@ def broadcast_iou(box_1, box_2):
 
 
 @logger.catch(reraise=True)
-def freeze_all(model, frozen=True, until_layer=-1):
+def freeze_all(model, frozen=True, until_layer=0):
     if isinstance(model, tf.keras.Model):
         if until_layer < 0:
-            until_layer = len(model.layers)
+            until_layer = len(model.layers) + until_layer
         for i, l in enumerate(model.layers):
-            if i > until_layer:
+            if i >= until_layer:
                 break
             freeze_all(l, frozen)
-    model.trainable = not frozen
+    else:
+        model.trainable = not frozen
+
 
 
 @logger.catch(reraise=True)
