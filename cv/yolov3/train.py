@@ -34,7 +34,7 @@ from cv.yolov3.core.models import (
     YoloV3, YoloV3Tiny
 )
 from cv.yolov3.core import utils as yolo_utils
-from utils.keras_utils import LogHistory, plot_history
+from utils.keras_utils import LogHistory, PlotHistory
 
 flags.DEFINE_integer("size", default=416, help="size of image")
 flags.DEFINE_integer('epochs', default=2, help='number of epochs')
@@ -155,6 +155,7 @@ def train(model, train_dataset, val_dataset):
         checkpoint_path = os_path.join(os_path.dirname(FLAGS.weights), "checkpoints",
                                        'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5')
         os_path.make_dir(os_path.dirname(checkpoint_path))
+        plt_his = PlotHistory()
         callbacks = [
             ReduceLROnPlateau(verbose=1),
             EarlyStopping(patience=FLAGS.early_stop, verbose=1),
@@ -162,7 +163,8 @@ def train(model, train_dataset, val_dataset):
                             monitor='val_loss', verbose=0, save_best_only=False,
                             save_weights_only=True, mode='auto', save_freq='epoch'),
             # TensorBoard(log_dir='../logs'),
-            LogHistory()
+            LogHistory(),
+            plt_his
         ]
         try:
             history = model.fit(train_dataset,
@@ -172,8 +174,8 @@ def train(model, train_dataset, val_dataset):
         except Exception as e:
             raise e
         finally:
-            plot_history(history, save_path=os_path.join(os_path.dirname(FLAGS.weights),
-                                                         f"{datetime.datetime.now().strftime('%Y%m%d-%H%M')}.png"))
+            plt_his.plot(save_path=os_path.join(os_path.dirname(FLAGS.weights),
+                                                f"{datetime.datetime.now().strftime('%Y%m%d-%H%M')}.png"))
 
 
 @logger.catch(reraise=True)
