@@ -101,7 +101,7 @@ class GPU:
             dic_memory_limit = {}
             for gpu_index in dic_memory_fraction:
                 memory_info = self.get_memory_info(gpu_index)
-                memory_limit = int(int(memory_info.total) >> 20 * dic_memory_fraction[gpu_index])
+                memory_limit = int((memory_info.total >> 20) * dic_memory_fraction[gpu_index])
                 dic_memory_limit[gpu_index] = memory_limit
             self.set_memory_limit(dic_memory_limit=dic_memory_limit)
 
