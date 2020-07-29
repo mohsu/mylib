@@ -44,7 +44,7 @@ class GPU:
     def __init__(self):
         import tensorflow as tf
         self.config = tf.config
-        self.physical_devices = tf.config.list_physical_devices('GPU')[::-1]
+        self.physical_devices = tf.config.list_physical_devices('GPU')
         self.visible_devices = self.physical_devices
         logger.debug(f"available gpus: {self.physical_devices}")
         self.auto_select_free = True
