@@ -9,6 +9,7 @@
 
 # 3rd-party packages
 from loguru import logger
+import pynvml
 
 
 # @logger.catch(reraise=True)
@@ -43,23 +44,44 @@ class GPU:
     def __init__(self):
         import tensorflow as tf
         self.config = tf.config
-        self.physical_devices = tf.config.list_physical_devices('GPU')
+        self.physical_devices = tf.config.list_physical_devices('GPU')[::-1]
         self.visible_devices = self.physical_devices
         logger.debug(f"available gpus: {self.physical_devices}")
+        self.auto_select_free = True
+
+    def get_memory_info(self, idx):
+        pynvml.nvmlInit()
+        handle = pynvml.nvmlDeviceGetHandleByIndex(idx)
+        meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        pynvml.nvmlShutdown()
+        return meminfo
+
+    def check_available(self, idx, fraction=0.7):
+        meminfo = self.get_memory_info(idx)
+        used = meminfo.used / meminfo.total
+        if used > fraction:
+            return False
+        else:
+            return True
 
     def set_visible_device(self, visible_device_indexes):
         if visible_device_indexes is None:
             visible_devices = []
-            self.config.set_visible_devices(devices=visible_devices, device_type='GPU')
-            self.visible_devices = visible_devices
         else:
             if isinstance(visible_device_indexes, int):
                 visible_device_indexes = [visible_device_indexes]
             visible_devices = []
             for i in visible_device_indexes:
-                visible_devices.append(self.physical_devices[i])
-            self.config.experimental.set_visible_devices(devices=visible_devices, device_type='GPU')
-            self.visible_devices = visible_devices
+                if self.check_available(i, 0.7):
+                    visible_devices.append(self.physical_devices[i])
+            if self.auto_select_free and len(visible_devices) < visible_device_indexes:
+                logger.debug("Not enough free gpu in selection, automatically select free gpu(s).")
+                free_gpu_idx = [j for j in self.physical_devices if
+                                j not in visible_device_indexes and self.check_available(j)]
+                visible_devices += free_gpu_idx[:(len(visible_device_indexes) - len(visible_devices))]
+
+        self.config.experimental.set_visible_devices(devices=visible_devices, device_type='GPU')
+        self.visible_devices = visible_devices
         logger.debug(f"Set available gpus: {visible_devices}")
 
     def set_allow_growth(self, allow_growth):
@@ -67,29 +89,21 @@ class GPU:
         for gpu in self.visible_devices:
             try:
                 self.config.experimental.set_memory_growth(gpu, allow_growth)
-            except RuntimeError as e:
+            except Exception as e:
                 logger.error(e)
-            except:
                 # Invalid device or cannot modify virtual devices once initialized.
-                pass
 
     def set_memory_fraction(self, memory_fraction=None, dic_memory_fraction=None):
-        import pynvml
-        pynvml.nvmlInit()
-
         if dic_memory_fraction is None and memory_fraction is not None:
             dic_memory_fraction = {gpu_index: memory_fraction for gpu_index in range(len(self.visible_devices))}
 
         if dic_memory_fraction is not None:
             dic_memory_limit = {}
             for gpu_index in dic_memory_fraction:
-                handle = pynvml.nvmlDeviceGetHandleByIndex(gpu_index)
-                memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
-                memory_limit = int(int(memory_info.total) / 1024 ** 2 * dic_memory_fraction[gpu_index])
+                memory_info = self.get_memory_info(gpu_index)
+                memory_limit = int(int(memory_info.total) >> 20 * dic_memory_fraction[gpu_index])
                 dic_memory_limit[gpu_index] = memory_limit
             self.set_memory_limit(dic_memory_limit=dic_memory_limit)
-
-        pynvml.nvmlShutdown()
 
     def set_memory_limit(self, memory_limit=None, dic_memory_limit=None):
         if dic_memory_limit is not None:
