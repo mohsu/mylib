@@ -374,7 +374,7 @@ def calculate_loss(obj_mask, true_class, pred_class):
     return _calculate_loss
 
 
-def YoloLoss(anchors, classes=[80], ignore_thresh=0.5):
+def YoloLoss(anchors, classes=[80], ignore_thresh=0.5, weights=[1, 1, 1, 1]):
     def yolo_loss(y_true, y_pred):
         # 1. transform all pred outputs
         # y_pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...cls))
@@ -423,10 +423,10 @@ def YoloLoss(anchors, classes=[80], ignore_thresh=0.5):
             start_idx = end_idx
 
         # 6. sum over (batch, gridx, gridy, anchors) => (batch, 1)
-        xy_loss = tf.reduce_sum(xy_loss, axis=(1, 2, 3))
-        wh_loss = tf.reduce_sum(wh_loss, axis=(1, 2, 3))
-        obj_loss = tf.reduce_sum(obj_loss, axis=(1, 2, 3))
-        class_loss = tf.reduce_sum(class_loss, axis=(1, 2, 3))
+        xy_loss = tf.reduce_sum(xy_loss, axis=(1, 2, 3)) * weights[0]
+        wh_loss = tf.reduce_sum(wh_loss, axis=(1, 2, 3)) * weights[1]
+        obj_loss = tf.reduce_sum(obj_loss, axis=(1, 2, 3)) * weights[2]
+        class_loss = tf.reduce_sum(class_loss, axis=(1, 2, 3)) * weights[3]
 
         return xy_loss + wh_loss + obj_loss + class_loss
 
