@@ -60,8 +60,6 @@ flags.DEFINE_enum('transfer', 'same',
 flags.DEFINE_integer('weights_num_classes', None, 'specify num class for `weights` file if different, '
                                                   'useful in transfer learning with different number of classes')
 
-logger.debug(f"Flags: {FLAGS.flags_into_string()}")
-
 
 def run_eager_fit(model, train_dataset, val_dataset, optimizer, loss):
     # Eager mode is great for debugging

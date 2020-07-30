@@ -23,3 +23,9 @@ def get_flag(attr, default=None):
         return default
     return default
 
+
+@logger.catch(reraise=True)
+def log_flag():
+
+    logger.debug(f"Flags: {FLAGS.flags_into_string()}")
+
