@@ -26,7 +26,7 @@ from tensorflow.keras.callbacks import (
 )
 
 # self-defined packages
-from utils import os_path, image_processing
+from utils import os_path, image_processing, flag_utils
 from cv.yolov3.core.layers import (
     YoloLoss
 )
@@ -110,6 +110,8 @@ def run_eager_fit(model, train_dataset, val_dataset, optimizer, loss):
 
 @logger.catch(reraise=True)
 def train(model, train_dataset, val_dataset):
+
+    flag_utils.log_flag()
     """Configure the model for transfer learning"""
     if FLAGS.transfer == 'none':
         pass  # Nothing to do
