@@ -57,6 +57,7 @@ flags.DEFINE_enum('transfer', 'same',
                   'frozen: Transfer and freeze all, '
                   'fine_tune: Transfer all and freeze darknet only, '
                   'same: Use previous trained model')
+flags.DEFINE_list('loss_weight', [1.0, 1.0, 1.0, 1.0], "[xy, wh, obj, class] loss weight")
 flags.DEFINE_integer('weights_num_classes', None, 'specify num class for `weights` file if different, '
                                                   'useful in transfer learning with different number of classes')
 
@@ -142,7 +143,8 @@ def train(model, train_dataset, val_dataset):
             yolo_utils.freeze_all(model, until_layer=FLAGS.freeze)
 
     optimizer = tf.keras.optimizers.Adam(lr=FLAGS.learning_rate)
-    loss = [YoloLoss(model.anchors[mask], classes=model.num_classes) for mask in model.anchor_masks]
+    loss = [YoloLoss(model.anchors[mask], classes=model.num_classes, weights=FLAGS.loss_weight) for mask in
+            model.anchor_masks]
 
     """Start training"""
     if FLAGS.fit == 'eager_tf':
