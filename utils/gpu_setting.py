@@ -76,13 +76,13 @@ class GPU:
                     visible_devices.append(self.physical_devices[i])
             if self.auto_select_free and len(visible_devices) < len(visible_device_indexes):
                 logger.debug("Not enough free gpu in selection, automatically select free gpu(s).")
-                free_gpu_idx = [j for j in range(len(self.physical_devices)) if
-                                j not in visible_device_indexes and self.check_available(j)]
-                visible_devices += free_gpu_idx[:(len(visible_device_indexes) - len(visible_devices))]
+                free_gpu_idxes = [j for j in range(len(self.physical_devices)) if
+                                  j not in visible_device_indexes and self.check_available(j)]
+                visible_devices += [self.physical_devices[free_gpu_idx] for free_gpu_idx in free_gpu_idxes[:(len(visible_device_indexes) - len(visible_devices))]]
 
-        self.config.experimental.set_visible_devices(devices=visible_devices, device_type='GPU')
-        self.visible_devices = visible_devices
-        logger.debug(f"Set available gpus: {visible_devices}")
+                self.config.experimental.set_visible_devices(devices=visible_devices, device_type='GPU')
+                self.visible_devices = visible_devices
+                logger.debug(f"Set available gpus: {visible_devices}")
 
     def set_allow_growth(self, allow_growth):
         logger.debug(f"Set gpu memory_growth to be : {allow_growth}")
