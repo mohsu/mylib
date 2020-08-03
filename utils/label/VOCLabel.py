@@ -362,8 +362,9 @@ class VOCAnnotation(VOCLabel):
 
     @size.setter
     def size(self, value):
-        value_int = tuple([int(v) for v in value])
-        self._size = value_int
+        if value:
+            value_int = tuple([int(v) for v in value])
+            self._size = value_int
 
     @property
     def segmented(self):
