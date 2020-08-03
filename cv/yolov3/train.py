@@ -265,7 +265,10 @@ def test(model, test_dataset, voc_set, box_thres=15):
                       suffixes=("", "_true")).reset_index(drop=True)
 
     # box_diff are huge (false positive)
-    false_positive_idx = df_all[df_all["diff"] > thres].index
+    df_all["w"] = df_all["x2_true"] - df_all["x1_true"]
+    df_all["h"] = df_all["y2_true"] - df_all["y1_true"]
+    df_all["diff_rate"] = df_all["diff"] / (df_all["w"] + df_all["h"]) / 2
+    false_positive_idx = df_all[df_all["diff_rate"] > thres].index
     df_all_1 = df_all.copy()
 
     # label mismatch
