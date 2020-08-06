@@ -1,4 +1,4 @@
-import glob
+from glob import glob
 import os
 import shutil
 from os.path import *
