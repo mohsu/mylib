@@ -116,3 +116,49 @@ def draw_annotation(annotation, color=(255, 0, 0), image=None):
     if image is None:
         image = imread(annotation.image_path)
     return draw_boxes(image, annotation.objects, color)
+
+
+def plot_rgb_hist(image, save_path=None):
+    # gray scale image
+    if image.ndim == 2 or (image.ndim == 3 and image.shape[-1] == 1):
+        plt.hist(image.ravel(), 256, [0, 256])
+    else:
+        color = ('b', 'g', 'r')
+        for i, col in enumerate(color):
+            histr = cv2.calcHist([image], [i], None, [256], [0, 256])
+            plt.plot(histr, color=col)
+            plt.xlim([0, 256])
+    plt.show()
+    if save_path:
+        plt.savefig(save_path)
+
+
+def plot_combined_rgb_hist(image, save_path=None, title=None):
+    if isinstance(image, str):
+        image = plt.imread(image, format='uint8')
+    plt.clf()
+
+    gray = cv2.cvtColor(image.copy(), cv2.COLOR_RGB2GRAY)
+    hist_gray = cv2.calcHist([gray], [0], None, [256], [0, 256])
+
+    plt.subplot(221), plt.imshow(gray, 'gray')
+    plt.subplot(222), plt.imshow(image)
+    plt.subplot(223), plt.plot(hist_gray)
+    plt.subplot(224)
+    color = ('b', 'g', 'r')
+    for i, col in enumerate(color):
+        histr = cv2.calcHist([image], [i], None, [256], [0, 256])
+        plt.plot(histr, color=col)
+        plt.xlim([0, 256])
+    plt.xlim([0, 256])
+
+    if title:
+        plt.title(title)
+
+    if save_path:
+        plt.savefig(save_path)
+    else:
+        plt.show()
+
+
+
