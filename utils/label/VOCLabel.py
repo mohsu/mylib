@@ -532,7 +532,7 @@ class VOCAnnotation(VOCLabel):
         return image
 
     def load_from_json_file(self, json_file):
-        with open(json_file) as f:
+        with open(json_file, "r") as f:
             j = json.load(f)
         self.__dict__.update(self.load_json(j, annotation_path=json_file).__dict__)
 
