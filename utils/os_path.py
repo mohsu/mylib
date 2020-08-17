@@ -198,14 +198,17 @@ def rm(full_path):
 
 
 @logger.catch(reraise=True)
-def cleanup_folder_by_time(folder_s, num_keep, logging=True):
+def cleanup_folder_by_time(folder_s, num_keep, logging=True, count_folder_instead=False):
     contents = list_dir(folder_s, exclude_pattern=".gitkeep", full_path=True)
     files = []
     for content in contents:
-        if os.path.isfile(content):
-            files.append(content)
+        if count_folder_instead:
+            files = contents
         else:
-            cleanup_folder_by_time(content, num_keep, logging)
+            if os.path.isfile(content):
+                files.append(content)
+            else:
+                cleanup_folder_by_time(content, num_keep, logging)
 
     files = sorted(files, key=os.path.getctime, reverse=True)  # newest at front (0)
     for i in range(num_keep, len(files)):
