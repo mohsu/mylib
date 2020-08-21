@@ -45,8 +45,9 @@ class GPU:
         import tensorflow as tf
         self.config = tf.config
         self.physical_devices = tf.config.list_physical_devices('GPU')
-        self.visible_devices = self.physical_devices
-        logger.debug(f"available gpus: {self.physical_devices}")
+        logger.debug(f"physical_devices gpus: {self.physical_devices}")
+        self.visible_devices = [self.physical_devices[i] for i in range(len(self.physical_devices)) if self.check_available(i)]
+        logger.debug(f"available gpus: {self.visible_devices}")
         self.auto_select_free = True
 
     def get_memory_info(self, idx):
@@ -72,7 +73,7 @@ class GPU:
                 visible_device_indexes = [visible_device_indexes]
             visible_devices = []
             for i in visible_device_indexes:
-                if self.check_available(i, 0.7):
+                if self.physical_devices[i] in self.visible_devices:
                     visible_devices.append(self.physical_devices[i])
             if self.auto_select_free and len(visible_devices) < len(visible_device_indexes):
                 logger.debug("Not enough free gpu in selection, automatically select free gpu(s).")
