@@ -610,6 +610,8 @@ class VOCAnnotationSet(VOCLabel):
                     self._class_dict[defined_class][klass] = []
 
         # load from dir or jsons or json
+        if not os_path.exists(dir_or_file):
+            raise FileNotFoundError
         if dir_or_file:
             if isinstance(dir_or_file, list) and all(os_path.isfile(x) for x in dir_or_file):
                 self.load_from_jsons(sorted(dir_or_file), debug=debug,
@@ -617,18 +619,18 @@ class VOCAnnotationSet(VOCLabel):
             elif os_path.isdir(dir_or_file) or \
                     (isinstance(dir_or_file, list) and all(os_path.isdir(x) for x in dir_or_file)):
                 if os_path.isdir(dir_or_file):
-                    label_files = os_path.list_dir(dir_or_file, extension=".json")
+                    label_files = os_path.list_dir(dir_or_file, extension=".json", exclude_pattern="._")
                 else:
                     label_files = []
                     for lf in dir_or_file:
-                        label_files += os_path.list_dir(lf, extension=".json")
+                        label_files += os_path.list_dir(lf, extension=".json", exclude_pattern="._")
                 if not label_files:
                     label_files = os_path.list_dir(os_path.join(dir_or_file, ANNOTATION_FOLDER_DEFAULT_NAME),
-                                                   extension=".json")
+                                                   extension=".json", exclude_pattern="._")
                 self.load_from_jsons(sorted(label_files), debug=debug, for_classification=for_classification,
                                      image_dir=image_dir)
             else:  # is file
-                raise NotImplemented
+                raise NotImplementedError
                 # self.load_from_json(dir_or_file)
 
     def add_annotation(self, annotation):
