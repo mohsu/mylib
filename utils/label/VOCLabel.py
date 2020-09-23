@@ -610,9 +610,9 @@ class VOCAnnotationSet(VOCLabel):
                     self._class_dict[defined_class][klass] = []
 
         # load from dir or jsons or json
-        if not os_path.exists(dir_or_file):
-            raise FileNotFoundError
         if dir_or_file:
+            if not os_path.exists(dir_or_file):
+                raise FileNotFoundError
             if isinstance(dir_or_file, list) and all(os_path.isfile(x) for x in dir_or_file):
                 self.load_from_jsons(sorted(dir_or_file), debug=debug,
                                      for_classification=for_classification, image_dir=image_dir)
