@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 from cv2 import *
 from typing import Union, List, Optional
 
