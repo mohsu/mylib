@@ -16,7 +16,7 @@ from loguru import logger
 # self-defined packages
 
 @logger.catch(reraise=True)
-def get_flag(attr: str, default: Optional[str] = None):
+def get_flag(attr: str, default: Optional[str] = None) -> str:
     try:
         if hasattr(FLAGS, attr):
             return getattr(FLAGS, attr)
@@ -26,5 +26,5 @@ def get_flag(attr: str, default: Optional[str] = None):
 
 
 @logger.catch(reraise=True)
-def log_flag():
+def log_flag() -> None:
     logger.debug(f"Flags: {FLAGS.flags_into_string()}")

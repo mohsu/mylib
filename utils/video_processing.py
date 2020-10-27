@@ -3,7 +3,7 @@ import multiprocessing as mp
 import threading
 import queue
 import time
-from typing import Optional, List
+from typing import Optional, List, Union, Tuple
 
 import cv2
 import numpy as np
@@ -40,7 +40,7 @@ def get_video_capture(URL: str, timeout: Optional[float] = 5):
 
 
 class VideoCaptureNoQueue:
-    def __init__(self, URL: str, timeout: Optional[float] = 5):
+    def __init__(self, URL: str, timeout: float = 5):
         self.frame = []
         self.status = False
         self.is_stop = False
@@ -108,7 +108,7 @@ class VideoYielder:
         logger.debug("Closing video capture.")
         self.cap.release()
 
-    def get_image(self):
+    def get_image(self) -> Union[np.ndarray, None]:
         while (now() - self.last_time).total_seconds() < self.interval:
             time.sleep(0.01)
 
@@ -137,14 +137,15 @@ class VideoYielder:
 
 
 @logger.catch(reraise=True)
-def get_video_length(video_path: str):
+def get_video_length(video_path: str) -> int:
     cap = cv2.VideoCapture(video_path)
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     return length
 
 
 @logger.catch(reraise=True)
-def get_frames_from_video(video_path: str, start: float, end: float, interval: int):
+def get_frames_from_video(video_path: str, start: float, end: float,
+                          interval: int) -> Tuple[List[int], List[np.ndarray]]:
     cap = cv2.VideoCapture(video_path)
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if start < 0:
@@ -174,7 +175,7 @@ def get_frames_from_video(video_path: str, start: float, end: float, interval: i
 
 
 @logger.catch(reraise=True)
-def get_frame_from_video(video_path: str, num_frame: int):
+def get_frame_from_video(video_path: str, num_frame: int) -> Union[None, np.ndarray]:
     cap = cv2.VideoCapture(video_path)
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if num_frame < 0:
@@ -193,7 +194,7 @@ def get_frame_from_video(video_path: str, num_frame: int):
 
 
 @logger.catch(reraise=True)
-def record_video_from_images(images: List[np.ndarray], output_path: str):
+def record_video_from_images(images: List[np.ndarray], output_path: str) -> None:
     H, W = images[0].shape[:2]
     fps = 15
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -205,7 +206,7 @@ def record_video_from_images(images: List[np.ndarray], output_path: str):
 
 
 @logger.catch(reraise=True)
-def record_video_from_queue(output_path: str, queue_image: mp.Queue, fps: int = 15):
+def record_video_from_queue(output_path: str, queue_image: mp.Queue, fps: int = 15) -> None:
     image = None
     # get the first roulette_image
     while image is None:

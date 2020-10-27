@@ -19,7 +19,7 @@ class TgBot:
         self.send_photo_url = "https://api.telegram.org/bot{}/sendPhoto".format(token)
 
     def send_message(self, telegram_group_chat_id: Union[str, int],
-                     text: Any, parse_mode: Optional[Any] = None):
+                     text: Any, parse_mode: Optional[Any] = None) -> requests.Response:
         """
         Send message from telegram bot in group
         """
@@ -32,7 +32,7 @@ class TgBot:
 
         return r
 
-    def send_photo(self, image_io, telegram_group_chat_id, caption=None):
+    def send_photo(self, image_io, telegram_group_chat_id, caption=None) -> requests.Response:
         """
         Send photo from telegram bot in group
         :param image_io: files = {'photo': open(image_path), 'rb')}

@@ -56,7 +56,7 @@ class PlotHistory(keras.callbacks.Callback):
         plt.show()
 
 
-def plot_history(history, save_path=None):
+def plot_history(history, save_path=None) -> None:
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
     plt.title('model loss')
@@ -69,7 +69,7 @@ def plot_history(history, save_path=None):
     plt.show()
 
 
-def get_balanced_weight(dic_class):
+def get_balanced_weight(dic_class: dict) -> dict:
     total = 0
     dic_weight = {}
 

@@ -34,3 +34,4 @@ def time_function(func):
         timer = Timer(f"{func.__name__}")
         func(*args, **kwargs)
         timer.stop()
+    return wrap
