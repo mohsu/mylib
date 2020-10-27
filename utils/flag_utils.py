@@ -7,7 +7,7 @@
 
 # python packages
 from absl.flags import FLAGS
-from typing import Optional, Union
+from typing import Optional
 
 # 3rd-party packages
 from loguru import logger

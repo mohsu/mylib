@@ -625,7 +625,7 @@ class VOCAnnotationSet(VOCLabel):
         self._for_classification = value
 
     def __init__(self, dir_or_file: Optional[Union[str, List[str]]] = None,
-                 defined_classes: Optional[type_myclass, List[type_myclass]] = None,
+                 defined_classes: Optional[Union[type_myclass, List[type_myclass]]] = None,
                  debug: bool = False,
                  for_classification: bool = False, image_dir: Optional[str] = None):
 

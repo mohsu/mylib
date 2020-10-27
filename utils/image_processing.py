@@ -7,7 +7,7 @@ from utils import os_path
 from utils.label.VOCLabel import VOCBbox, VOCAnnotation
 
 
-def show(image: Union[np.ndarray, list], convert_BGR: Optional[bool] = True,
+def show(image: Union[np.ndarray, list], convert_BGR: bool = True,
          title: Optional[Union[List[str], str]] = None) -> None:
     if isinstance(image, list):
         return show_images(image, convert_BGR, title)
@@ -36,7 +36,7 @@ def show_images(images: List[np.ndarray], convert_BGR: bool, titles: List[str]) 
             show(image, convert_BGR)
 
 
-def to_bytes(image: np.ndarray, _format: Optional[str] = ".png"):
+def to_bytes(image: np.ndarray, _format: str = ".png"):
     success, encoded_image = cv2.imencode(_format, image)
     image_bytearr = encoded_image.tobytes()
     return image_bytearr
@@ -48,8 +48,8 @@ def read_image_from_io(imgData: str) -> np.ndarray:
     return img
 
 
-def save_image(image: np.ndarray, image_path: str, make_dir: Optional[bool] = True,
-               convert_BGR: Optional[bool] = False) -> None:
+def save_image(image: np.ndarray, image_path: str, make_dir: bool = True,
+               convert_BGR: bool = False) -> None:
     if make_dir:
         os_path.make_dir(os_path.os.path.dirname(image_path))
 
@@ -69,9 +69,9 @@ def save_image(image: np.ndarray, image_path: str, make_dir: Optional[bool] = Tr
 
 def draw_box(image: np.ndarray,
              bbox: Union[list, tuple, np.ndarray, VOCBbox],
-             color: Optional[tuple] = (255, 0, 0),
-             label: Optional[str, int, float] = None,
-             font_size: Optional[int] = 1) -> np.ndarray:
+             color: tuple = (255, 0, 0),
+             label: Optional[Union[str, int, float]] = None,
+             font_size: int = 1) -> np.ndarray:
     image = np.copy(image)
     H, W = image.shape[:2]
     h_stride, w_stride = H // 60, W // 200
@@ -99,9 +99,9 @@ def draw_box(image: np.ndarray,
 def draw_boxes(image: np.ndarray,
                bboxes: Union[
                    list, tuple, np.ndarray, VOCBbox, List[list], List[tuple], List[np.ndarray], List[VOCBbox]],
-               color: Optional[tuple] = (255, 0, 0),
-               labels: Optional[str, int, float, List[str], List[int], List[float]] = None,
-               font_sizes: Optional[int, List[int]] = 1) -> np.ndarray:
+               color: tuple = (255, 0, 0),
+               labels: Union[str, int, float, List[str], List[int], List[float]] = None,
+               font_sizes: Union[int, List[int]] = 1) -> np.ndarray:
     if not isinstance(bboxes, list):
         bboxes = [bboxes]
 
@@ -119,7 +119,7 @@ def draw_boxes(image: np.ndarray,
 
 
 def draw_annotation(annotation: VOCAnnotation,
-                    color: Optional[tuple] = (255, 0, 0),
+                    color: tuple = (255, 0, 0),
                     image: Optional[np.ndarray] = None) -> np.ndarray:
     if image is None:
         image = imread(annotation.image_path)

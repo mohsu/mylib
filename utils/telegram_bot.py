@@ -43,7 +43,6 @@ class TgBot:
         data = {'chat_id': telegram_group_chat_id}
         if caption:
             data["caption"] = caption
-
         r = requests.post(self.send_photo_url, files={'photo': image_io}, data=data)
         image_io.close()
         return r
