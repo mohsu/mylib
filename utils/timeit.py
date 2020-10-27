@@ -6,8 +6,7 @@
 """
 
 # python packages
-import timeit
-
+import time
 # 3rd-party packages
 from loguru import logger
 
@@ -17,14 +16,14 @@ from loguru import logger
 class Timer:
     def __init__(self, name=None):
         self.name = name
-        self.start_time = timeit.default_timer()
+        self.start_time = time.time()
         self.end_time = None
 
     def start(self):
-        self.start_time = timeit.default_timer()
+        self.start_time = time.time()
 
     def stop(self):
-        self.end_time = timeit.default_timer()
+        self.end_time = time.time()
         logger.debug(
             f"{self.name + ' ' if self.name is not None else ''} Time elapse {self.end_time - self.start_time}s")
 
