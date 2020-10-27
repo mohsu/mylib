@@ -7,6 +7,7 @@
 
 # python packages
 from enum import EnumMeta, Flag
+from typing import TypeVar
 
 
 # 3rd-party
@@ -116,6 +117,9 @@ class BoolFlag(Flag, metaclass=ReversibleEnumMeta):
 class CombinedEnumElement(list):
     def __str__(self):
         return "".join([str(x) for x in self])
+
+
+type_myclass = TypeVar('type_myclass', ReversibleEnumMeta, BoolFlag)
 
 # class CombinedReversibleEnum:
 #     def __init__(self, *enums, list_overlap=None):

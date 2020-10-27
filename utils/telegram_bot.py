@@ -7,35 +7,21 @@
 
 # python packages
 import requests
+from typing import Any, Union, Optional
+
 
 # 3rd-party packages
-# from configobj import ConfigObj
-# from loguru import logger
-
-# self-defined packages
-# from utils import os_path
-
-# global variables
-# log_path = "./log/"
-# config_path = "./config/"
-
-# set up log & config
-# logger.add(log_path, rotation="5 MB", retention="1 week") # filter=lambda record: record["extra"].get("name") == ""
-# logger = logger.bind(name="")
-# config = ConfigObj(config_path)
 
 
 class TgBot:
-    def __init__(self, token):
+    def __init__(self, token: Any):
         self.token = token
         self.send_photo_url = "https://api.telegram.org/bot{}/sendPhoto".format(token)
 
-    def send_message(self, telegram_group_chat_id, text, parse_mode=None):
+    def send_message(self, telegram_group_chat_id: Union[str, int],
+                     text: Any, parse_mode: Optional[Any] = None):
         """
         Send message from telegram bot in group
-        :param telegram_group_chat_id:
-        :param text:
-        :return:
         """
         request = "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}".format(self.token,
                                                                                          telegram_group_chat_id,

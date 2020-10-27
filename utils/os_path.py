@@ -2,6 +2,7 @@ from glob import glob
 import os
 import shutil
 from os.path import *
+from typing import Optional, Any, List, Union
 
 from loguru import logger
 
@@ -9,12 +10,13 @@ IMAGE_EXT = [".jpg", ".png"]
 
 
 @logger.catch(reraise=True)
-def copy(path1, path2):
+def copy(path1: str, path2: str):
     shutil.copy2(path1, path2)
 
 
 @logger.catch(reraise=True)
-def copytree(src, dst, symlinks=False, ignore=None, overwrite=True):
+def copytree(src: str, dst: str,
+             symlinks: bool = False, ignore: Optional[bool] = None, overwrite: bool = True):
     for item in os.listdir(src):
         s = os.path.join(src, item)
         d = os.path.join(dst, item)
@@ -28,7 +30,7 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=True):
 
 
 @logger.catch(reraise=True)
-def rename(path1, path2):
+def rename(path1: str, path2: str):
     tmp_file = f"{path1}.tmp"
     shutil.copy2(path1, tmp_file)
     try:
@@ -39,13 +41,13 @@ def rename(path1, path2):
 
 
 @logger.catch(reraise=True)
-def chdir(path):
+def chdir(path: str):
     logger.debug("Current path has changed to {}".format(os.path.abspath(path)))
     os.chdir(path)
 
 
 @logger.catch(reraise=True)
-def join(path, *paths):
+def join(path: Any, *paths: Any):
     path = str(path)
     paths_s = []
     for i in range(len(paths)):
@@ -54,7 +56,7 @@ def join(path, *paths):
 
 
 @logger.catch(reraise=True)
-def check_pattern(pattern, filename, check_all=False):
+def check_pattern(pattern: str, filename: str, check_all: bool = False):
     if isinstance(pattern, list):
         return check_patterns(pattern, filename, check_all)
 
@@ -67,7 +69,7 @@ def check_pattern(pattern, filename, check_all=False):
 
 
 @logger.catch(reraise=True)
-def check_patterns(patterns, filename, check_all=False):
+def check_patterns(patterns: List[str], filename: str, check_all: bool = False):
     for pattern in patterns:
         is_contain = check_pattern(pattern, filename, False)
         if check_all:
@@ -83,7 +85,7 @@ def check_patterns(patterns, filename, check_all=False):
 
 
 @logger.catch(reraise=True)
-def check_extension(extension, filename):
+def check_extension(extension: Union[str, List[str]], filename: str):
     if extension is None:
         return True
 
@@ -99,7 +101,7 @@ def check_extension(extension, filename):
 
 
 @logger.catch(reraise=True)
-def check_extensions(extensions, filename):
+def check_extensions(extensions: List[str], filename: str):
     for extension in extensions:
         if check_extension(extension, filename):
             return True
@@ -107,7 +109,7 @@ def check_extensions(extensions, filename):
 
 
 @logger.catch(reraise=True)
-def list_dir(_dir, sort=False, recursive=False, pattern=None,
+def list_dir(_dir: str, sort=False, recursive=False, pattern=None,
              extension=None, full_path=True, abs_path=False, exclude_pattern="\x00", check_all_pattern=False,
              sort_key=None):
     paths = []
@@ -156,7 +158,7 @@ def list_dir(_dir, sort=False, recursive=False, pattern=None,
 
 
 @logger.catch(reraise=True)
-def make_dir(_dir):
+def make_dir(_dir: str):
     if not os.path.exists(_dir):
         os.makedirs(_dir)
         logger.debug(f"Directory {os.path.abspath(_dir)} is created")
@@ -164,7 +166,7 @@ def make_dir(_dir):
 
 
 @logger.catch(reraise=True)
-def dirname(path, depth=1, full_path=True):
+def dirname(path: str, depth: int = 1, full_path: bool = True):
     _dir = os.path.dirname(path)
     if depth > 1:
         for i in range(depth - 1):
@@ -176,7 +178,7 @@ def dirname(path, depth=1, full_path=True):
 
 
 @logger.catch(reraise=True)
-def str2bool(v):
+def str2bool(v: Union[str, bool]):
     if isinstance(v, bool):
         return v
     if v.lower() in ('yes', 'true', 'mytest', 'y', '1'):
@@ -188,7 +190,7 @@ def str2bool(v):
 
 
 @logger.catch(reraise=True)
-def rm(full_path):
+def rm(full_path: str):
     if not exists(full_path):
         return
     if os.path.isfile(full_path):
@@ -198,7 +200,8 @@ def rm(full_path):
 
 
 @logger.catch(reraise=True)
-def cleanup_folder_by_time(folder_s, num_keep, logging=True, count_folder_instead=False):
+def cleanup_folder_by_time(folder_s: str, num_keep: int, logging: bool = True,
+                           count_folder_instead: bool = False):
     contents = list_dir(folder_s, exclude_pattern=".gitkeep", full_path=True)
     files = []
     for content in contents:
@@ -224,13 +227,13 @@ def cleanup_folder_by_time(folder_s, num_keep, logging=True, count_folder_instea
 
 
 @logger.catch(reraise=True)
-def get_filename(path):
+def get_filename(path: str):
     filename = os.path.basename(path)
     filename, _ = os.path.splitext(filename)
     return filename
 
 
 @logger.catch(reraise=True)
-def make_sub_dirs(_dir, sub_dirs):
+def make_sub_dirs(_dir: Any, sub_dirs: List[Any]):
     for sub_dir in sub_dirs:
         make_dir(join(_dir, sub_dir))

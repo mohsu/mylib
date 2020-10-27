@@ -1,20 +1,16 @@
 import numpy as np
-import cv2
-from cv2 import *
-# # enable X11 Forwarding
-# # # 1. add DISPLAY to environment variable
-# # # 2.
-# import matplotlib
-# matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from cv2 import *
+from typing import Union, List, Optional
 
 from utils import os_path
+from utils.label.VOCLabel import VOCBbox, VOCAnnotation
 
 
-def show(image, convert_BGR=True, title=None):
+def show(image: Union[np.ndarray, list], convert_BGR: Optional[bool] = True,
+         title: Optional[Union[List[str], str]] = None):
     if isinstance(image, list):
-        show_images(image, convert_BGR, title)
-        return 0
+        return show_images(image, convert_BGR, title)
     image = image.astype('uint8')
     if len(image.shape) == 2:
         is_bw = True
@@ -31,7 +27,7 @@ def show(image, convert_BGR=True, title=None):
     plt.show()
 
 
-def show_images(images, convert_BGR, titles):
+def show_images(images: List[np.ndarray], convert_BGR: bool, titles: List[str]):
     if titles is not None:
         for image, title in zip(images, titles):
             show(image, convert_BGR, title)
@@ -40,19 +36,20 @@ def show_images(images, convert_BGR, titles):
             show(image, convert_BGR)
 
 
-def to_bytes(image, _format=".png"):
+def to_bytes(image: np.ndarray, _format: Optional[str] = ".png"):
     success, encoded_image = cv2.imencode(_format, image)
     image_bytearr = encoded_image.tobytes()
     return image_bytearr
 
 
-def read_image_from_io(imgData):
+def read_image_from_io(imgData: str):
     data = np.fromstring(imgData, np.uint8)
     img = cv2.imdecode(data, cv2.IMREAD_COLOR)
     return img
 
 
-def save_image(image, image_path, make_dir=True, convert_BGR=False):
+def save_image(image: np.ndarray, image_path: str, make_dir: Optional[bool] = True,
+               convert_BGR: Optional[bool] = False):
     if make_dir:
         os_path.make_dir(os_path.os.path.dirname(image_path))
 
@@ -70,7 +67,11 @@ def save_image(image, image_path, make_dir=True, convert_BGR=False):
     cv2.imwrite(image_path, image)
 
 
-def draw_box(image, bbox, color=(255, 0, 0), label=None, font_size=1):
+def draw_box(image: np.ndarray,
+             bbox: Union[list, tuple, np.ndarray, VOCBbox],
+             color: Optional[tuple] = (255, 0, 0),
+             label: Optional[str, int, float] = None,
+             font_size: Optional[int] = 1):
     image = np.copy(image)
     H, W = image.shape[:2]
     h_stride, w_stride = H // 60, W // 200
@@ -95,7 +96,12 @@ def draw_box(image, bbox, color=(255, 0, 0), label=None, font_size=1):
     return image
 
 
-def draw_boxes(image, bboxes, color=(255, 0, 0), labels=None, font_sizes=1):
+def draw_boxes(image: np.ndarray,
+               bboxes: Union[
+                   list, tuple, np.ndarray, VOCBbox, List[list], List[tuple], List[np.ndarray], List[VOCBbox]],
+               color: Optional[tuple] = (255, 0, 0),
+               labels: Optional[str, int, float, List[str], List[int], List[float]] = None,
+               font_sizes: Optional[int, List[int]] = 1):
     if not isinstance(bboxes, list):
         bboxes = [bboxes]
 
@@ -112,13 +118,15 @@ def draw_boxes(image, bboxes, color=(255, 0, 0), labels=None, font_sizes=1):
     return image
 
 
-def draw_annotation(annotation, color=(255, 0, 0), image=None):
+def draw_annotation(annotation: VOCAnnotation,
+                    color: Optional[tuple] = (255, 0, 0),
+                    image: Optional[np.ndarray] = None):
     if image is None:
         image = imread(annotation.image_path)
     return draw_boxes(image, annotation.objects, color)
 
 
-def plot_rgb_hist(image, save_path=None):
+def plot_rgb_hist(image: np.ndarray, save_path: Optional[str] = None):
     # gray scale image
     if image.ndim == 2 or (image.ndim == 3 and image.shape[-1] == 1):
         plt.hist(image.ravel(), 256, [0, 256])
@@ -133,7 +141,7 @@ def plot_rgb_hist(image, save_path=None):
         plt.savefig(save_path)
 
 
-def plot_combined_rgb_hist(image, save_path=None, title=None):
+def plot_combined_rgb_hist(image: Union[str, np.ndarray], save_path: Optional[str] = None, title: Optional[str] = None):
     if isinstance(image, str):
         image = plt.imread(image, format='uint8')
     plt.clf()
@@ -159,6 +167,3 @@ def plot_combined_rgb_hist(image, save_path=None, title=None):
         plt.savefig(save_path)
     else:
         plt.show()
-
-
-

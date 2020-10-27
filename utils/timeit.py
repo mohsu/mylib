@@ -27,3 +27,10 @@ class Timer:
         self.end_time = timeit.default_timer()
         logger.debug(
             f"{self.name + ' ' if self.name is not None else ''} Time elapse {self.end_time - self.start_time}s")
+
+
+def time_function(func):
+    def wrap(*args, **kwargs):
+        timer = Timer(f"{func.__name__}")
+        func(*args, **kwargs)
+        timer.stop()

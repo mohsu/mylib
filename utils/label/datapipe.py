@@ -7,14 +7,15 @@
 
 # python packages
 from enum import Enum
+from typing import Union, List, Optional
 
 # 3rd-party packages
 import numpy as np
 from loguru import logger
 
-
 # self-defined packages
 from utils.label.VOCLabel import VOCAnnotationSet
+from utils.my_class import type_myclass
 
 
 class Dataset(Enum):
@@ -23,7 +24,7 @@ class Dataset(Enum):
     TEST = "test"
 
 
-def get_indexes(nb_samples, test_split, val_split, is_shuffle):
+def get_indexes(nb_samples: int, test_split: float, val_split: float, is_shuffle: bool):
     indexes = np.arange(nb_samples)
 
     if is_shuffle:
@@ -45,17 +46,18 @@ def get_indexes(nb_samples, test_split, val_split, is_shuffle):
     return train_indexes, val_indexes, test_indexes
 
 
-def VOCAnnotationSets(datasets, voc_dataset_class, image_dirs):
-    voc_set = None
+def VOCAnnotationSets(datasets: List[str], voc_dataset_class: Optional[Union[List[type_myclass], type_myclass]],
+                      image_dirs: List[str]):
+    combined_voc_set = None
     for dir_, image_dir in zip(datasets, image_dirs):
-        _set = VOCAnnotationSet(dir_,
-                                defined_classes=voc_dataset_class,
-                                image_dir=image_dir)
-        if voc_set is None:
-            voc_set = _set
+        voc_set = VOCAnnotationSet(dir_,
+                                   defined_classes=voc_dataset_class,
+                                   image_dir=image_dir)
+        if combined_voc_set is None:
+            combined_voc_set = voc_set
         else:
-            voc_set.add_annotation(_set.annotations)
-    return voc_set
+            combined_voc_set.add_annotation(voc_set.annotations)
+    return combined_voc_set
 
 
 class VOCDataSubset(VOCAnnotationSet):
@@ -75,13 +77,14 @@ class VOCDataSubset(VOCAnnotationSet):
     def nb_samples(self):
         return len(self)
 
-    def __init__(self, voc_set, val_split=0.1, test_split=0.1, is_shuffle=True, balanced=False):
+    def __init__(self, voc_set: VOCAnnotationSet, val_split: float = 0.1, test_split: float = 0.1,
+                 is_shuffle: bool = True, balanced: bool = False):
         super().__init__()
         self.__dict__.update(voc_set.__dict__)
         self._set_indexes = {Dataset.TRAIN: np.array([]), Dataset.VALIDATION: np.array([]), Dataset.TEST: np.array([])}
         self._split_data(val_split, test_split, is_shuffle, balanced)
 
-    def _split_data(self, val_split, test_split, is_shuffle, balanced):
+    def _split_data(self, val_split: float, test_split: float, is_shuffle: bool, balanced: bool):
         if val_split == 0 and test_split == 0:
             self._set_indexes[Dataset.TRAIN] = np.arange(self.nb_samples)
         else:
@@ -110,7 +113,7 @@ class VOCDataSubset(VOCAnnotationSet):
                 f"Total nb_samples {self.nb_samples}, train: {len(self._set_indexes[Dataset.TRAIN])}, "
                 f"val: {len(self._set_indexes[Dataset.VALIDATION])}, test: {len(self._set_indexes[Dataset.TEST])}")
 
-    def _get_subset(self, subset):
+    def _get_subset(self, subset: str):
         voc_set = VOCAnnotationSet(defined_classes=self.defined_classes, debug=self.debug,
                                    for_classification=self.for_classification)
         for i in self._set_indexes[Dataset(subset)]:

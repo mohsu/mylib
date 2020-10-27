@@ -3,8 +3,10 @@ import multiprocessing as mp
 import threading
 import queue
 import time
+from typing import Optional, List
 
 import cv2
+import numpy as np
 from loguru import logger
 
 now = datetime.datetime.now
@@ -16,7 +18,7 @@ class VideoYielderError(Exception):
 
 
 class VideoCaptureDaemon(threading.Thread):
-    def __init__(self, URL, result_queue):
+    def __init__(self, URL: str, result_queue: mp.Queue):
         super().__init__()
         self.daemon = True
         self.URL = URL
@@ -26,7 +28,7 @@ class VideoCaptureDaemon(threading.Thread):
         self.result_queue.put(cv2.VideoCapture(self.URL))
 
 
-def get_video_capture(URL, timeout=5):
+def get_video_capture(URL: str, timeout: Optional[float] = 5):
     res_queue = queue.Queue()
     VideoCaptureDaemon(URL, res_queue).start()
     try:
@@ -38,7 +40,7 @@ def get_video_capture(URL, timeout=5):
 
 
 class VideoCaptureNoQueue:
-    def __init__(self, URL, timeout=5):
+    def __init__(self, URL: str, timeout: Optional[float] = 5):
         self.frame = []
         self.status = False
         self.is_stop = False
@@ -79,7 +81,8 @@ class VideoCaptureNoQueue:
 
 @logger.catch(reraise=True)
 class VideoYielder:
-    def __init__(self, path, n_frame_per_sec=None, timeout=5, auto_restart=True):
+    def __init__(self, path: str, n_frame_per_sec: Optional[int] = None, timeout: Optional[float] = 5,
+                 auto_restart: bool = True):
         self.path = path
         self.n_frame_per_sec = n_frame_per_sec
         self.timeout = timeout
@@ -134,14 +137,14 @@ class VideoYielder:
 
 
 @logger.catch(reraise=True)
-def get_video_length(video_path):
+def get_video_length(video_path: str):
     cap = cv2.VideoCapture(video_path)
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     return length
 
 
 @logger.catch(reraise=True)
-def get_frames_from_video(video_path, start, end, interval):
+def get_frames_from_video(video_path: str, start: float, end: float, interval: int):
     cap = cv2.VideoCapture(video_path)
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if start < 0:
@@ -171,7 +174,7 @@ def get_frames_from_video(video_path, start, end, interval):
 
 
 @logger.catch(reraise=True)
-def get_frame_from_video(video_path, num_frame):
+def get_frame_from_video(video_path: str, num_frame: int):
     cap = cv2.VideoCapture(video_path)
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if num_frame < 0:
@@ -190,7 +193,7 @@ def get_frame_from_video(video_path, num_frame):
 
 
 @logger.catch(reraise=True)
-def record_video_from_images(images, output_path):
+def record_video_from_images(images: List[np.ndarray], output_path: str):
     H, W = images[0].shape[:2]
     fps = 15
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -202,7 +205,7 @@ def record_video_from_images(images, output_path):
 
 
 @logger.catch(reraise=True)
-def record_video_from_queue(output_path, queue_image, fps=15):
+def record_video_from_queue(output_path: str, queue_image: mp.Queue, fps: int = 15):
     image = None
     # get the first roulette_image
     while image is None:
@@ -222,7 +225,7 @@ def record_video_from_queue(output_path, queue_image, fps=15):
 
 @logger.catch(reraise=True)
 class Recorder:
-    def __init__(self, output_path, fps=15):
+    def __init__(self, output_path: str, fps: int = 15):
         self.output_path = output_path
         self.queue_image = mp.Queue()
         self.p_record = mp.Process(target=record_video_from_queue, args=(self.output_path, self.queue_image, fps,))
@@ -238,16 +241,3 @@ class Recorder:
         self.queue_image.put(None)
         self.queue_image.close()
         self.queue_image.join_thread()
-
-
-if __name__ == '__main__':
-    path = "../../sample/20191101-2_0758_0811_25.mp4"
-    stream_gen = VideoYielder(path, 3, timeout=3)
-    stream_gen.start()
-    count = 0
-    while True:
-        image = stream_gen.get_image()
-        if image is not None:
-            count += 1
-            if count % 30 == 1:
-                print("get image {}".format(count))
