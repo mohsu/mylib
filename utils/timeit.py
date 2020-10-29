@@ -16,16 +16,17 @@ from loguru import logger
 class Timer:
     def __init__(self, name=None):
         self.name = name
-        self.start_time = time.time()
+        self.start_time = time.perf_counter()
         self.end_time = None
 
     def start(self):
-        self.start_time = time.time()
+        self.start_time = time.perf_counter()
 
     def stop(self):
-        self.end_time = time.time()
+        self.end_time = time.perf_counter()
         logger.debug(
-            f"{self.name + ' ' if self.name is not None else ''} Time elapse {self.end_time - self.start_time}s")
+            f"{self.name + ' ' if self.name is not None else ''} "
+            f"Time elapse {self.end_time - self.start_time}s ({self.end_time} - {self.start_time})")
 
 
 def time_function(func):
