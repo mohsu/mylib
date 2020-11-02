@@ -22,11 +22,13 @@ class Timer:
     def start(self):
         self.start_time = time.perf_counter()
 
-    def stop(self):
+    def stop(self) -> float:
         self.end_time = time.perf_counter()
+        time_elapsed = self.end_time - self.start_time
         logger.debug(
             f"{self.name + ' ' if self.name is not None else ''} "
-            f"Time elapse {self.end_time - self.start_time}s ({self.end_time} - {self.start_time})")
+            f"Time elapse {time_elapsed}s ({self.end_time} - {self.start_time})")
+        return time_elapsed
 
 
 def time_function(func):
