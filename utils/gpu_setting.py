@@ -39,19 +39,20 @@ class GPU:
         else:
             return True
 
-    def set_visible_device(self, visible_device_indexes: Union[int, List[int]]) -> None:
+    def set_visible_device(self, visible_device_indexes: Optional[Union[int, List[int]]]) -> None:
         if isinstance(visible_device_indexes, int):
             visible_device_indexes = [visible_device_indexes]
         visible_devices = []
-        for i in visible_device_indexes:
-            if self.physical_devices[i] in self.visible_devices:
-                visible_devices.append(self.physical_devices[i])
-        if self.auto_select_free and len(visible_devices) < len(visible_device_indexes):
-            logger.debug("Not enough free gpu in selection, automatically select free gpu(s).")
-            free_gpu_idxes = [j for j in range(len(self.physical_devices)) if
-                              j not in visible_device_indexes and self.check_available(j)]
-            visible_devices += [self.physical_devices[free_gpu_idx] for free_gpu_idx in
-                                free_gpu_idxes[:(len(visible_device_indexes) - len(visible_devices))]]
+        if visible_device_indexes or visible_device_indexes[0] < 0:
+            for i in visible_device_indexes:
+                if self.physical_devices[i] in self.visible_devices:
+                    visible_devices.append(self.physical_devices[i])
+            if self.auto_select_free and len(visible_devices) < len(visible_device_indexes):
+                logger.debug("Not enough free gpu in selection, automatically select free gpu(s).")
+                free_gpu_idxes = [j for j in range(len(self.physical_devices)) if
+                                  j not in visible_device_indexes and self.check_available(j)]
+                visible_devices += [self.physical_devices[free_gpu_idx] for free_gpu_idx in
+                                    free_gpu_idxes[:(len(visible_device_indexes) - len(visible_devices))]]
 
         self.config.experimental.set_visible_devices(devices=visible_devices, device_type='GPU')
         self.visible_devices = visible_devices
