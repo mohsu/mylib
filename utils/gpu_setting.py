@@ -43,7 +43,7 @@ class GPU:
         if isinstance(visible_device_indexes, int):
             visible_device_indexes = [visible_device_indexes]
         visible_devices = []
-        if visible_device_indexes or visible_device_indexes[0] < 0:
+        if visible_device_indexes and visible_device_indexes[0] > 0:
             for i in visible_device_indexes:
                 if self.physical_devices[i] in self.visible_devices:
                     visible_devices.append(self.physical_devices[i])
